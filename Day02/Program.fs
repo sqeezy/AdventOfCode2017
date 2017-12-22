@@ -19,12 +19,17 @@ let input = "5806	6444	1281	38	267	1835	223	4912	5995	230	4395	2986	6048	4719	21
 588	345	67	286	743	54	802	776	29	44	107	63	303	372	41	810
 128	2088	3422	111	3312	740	3024	1946	920	131	112	477	3386	2392	1108	2741"
 
-//compute sum of difference between max and min per line
+//1 - compute sum of difference between max and min per line
+//2 - compute sum of only 2 numbers per line that can be dived to reuslt in a flat integer
+
+let getLines (fileContent : String) = fileContent.Split [|'\r'|]
+let numbersPerLine (lines : String[]) = lines |> Seq.map(fun x -> x.Split [|' '; '\t'|] |> Seq.map (Int32.Parse))
+let difOfMaxAndMin (nums:seq<int>)  =
+    let (max,min) = (Seq.max nums, Seq.min nums)
+    Math.Abs(max-min)
+let partOne = getLines >> numbersPerLine >> Seq.map difOfMaxAndMin >> Seq.sum
 
 [<EntryPoint>]
 let main argv =
-    let lines = input.Split [|'\r'|]
-    let numbersPerLine = lines |> Seq.map(fun x -> x.Split [|' '; '\t'|] |> Seq.map (Int32.Parse))
-    let sum = numbersPerLine |> Seq.sumBy (fun l -> Math.Abs(Seq.max l-Seq.min l))
-    sum |> printf "%A"
+    input |> partOne |> printf "1 - %A"
     0 // return an integer exit code
