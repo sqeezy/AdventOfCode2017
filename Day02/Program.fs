@@ -23,13 +23,53 @@ let input = "5806	6444	1281	38	267	1835	223	4912	5995	230	4395	2986	6048	4719	21
 //2 - compute sum of only 2 numbers per line that can be dived to reuslt in a flat integer
 
 let getLines (fileContent : String) = fileContent.Split [|'\r'|]
-let numbersPerLine (lines : String[]) = lines |> Seq.map(fun x -> x.Split [|' '; '\t'|] |> Seq.map (Int32.Parse))
+let numbersPerLine (lines : String[]) = lines 
+                                            |> Seq.map(fun x -> 
+                                                            x.Split [|' '; '\t'|] 
+                                                                |> Seq.map (Int32.Parse)
+                                                                |> Seq.toList
+                                                      )
+                                            |> Seq.toList
 let difOfMaxAndMin (nums:seq<int>)  =
     let (max,min) = (Seq.max nums, Seq.min nums)
-    Math.Abs(max-min)
-let partOne = getLines >> numbersPerLine >> Seq.map difOfMaxAndMin >> Seq.sum
+    Math.Abs(max - min)
+
+
+let allPairs nums =
+    let rec allPairs nums r =
+        match nums with
+        | [] -> r
+        | head :: tail -> 
+            let pairsWithHead = tail |> List.map (fun l -> (head,l))
+            allPairs tail (List.append pairsWithHead r)
+    allPairs nums []
+
+let canBeDevidedEvenly pair =
+    match pair with
+    | (a,b) when (a/b) = 0       -> false
+    | (a,b) when (a/b)%(a/b) = 0 -> true
+    | (a,b) when (b/a)%(b/a) = 0 -> true
+    | _                          -> false
+
+let singleMatchInLine  condition line = line
+                                        |> List.filter condition
+                                        |> List.head // should be List.exactlyOne
+
+let singlePairThatCanBeEvenlyDevided = singleMatchInLine canBeDevidedEvenly
+
+let partOne = getLines 
+                >> numbersPerLine 
+                >> Seq.map difOfMaxAndMin 
+                >> Seq.sum
+
+let partTwo = getLines
+                >> numbersPerLine
+                >> List.map allPairs
+                >> List.map singlePairThatCanBeEvenlyDevided
+                >> List.sumBy (fun (x,y) -> x + y)
 
 [<EntryPoint>]
-let main argv =
-    input |> partOne |> printf "1 - %A"
+let main _ =
+    input |> partOne |> printfn "1 - %A"
+    input |> partTwo |> printfn "2 - %A"
     0 // return an integer exit code
