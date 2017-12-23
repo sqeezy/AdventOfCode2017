@@ -22,6 +22,10 @@ let input = "5806	6444	1281	38	267	1835	223	4912	5995	230	4395	2986	6048	4719	21
 //1 - compute sum of difference between max and min per line
 //2 - compute sum of only 2 numbers per line that can be dived to reuslt in a flat integer
 
+let inspect o =
+    printfn "inspect - %A" o
+    o
+
 let getLines (fileContent : String) = fileContent.Split [|'\r'|]
 let numbersPerLine (lines : String[]) = lines 
                                             |> Seq.map(fun x -> 
@@ -34,7 +38,6 @@ let difOfMaxAndMin (nums:seq<int>)  =
     let (max,min) = (Seq.max nums, Seq.min nums)
     Math.Abs(max - min)
 
-
 let allPairs nums =
     let rec allPairs nums r =
         match nums with
@@ -46,16 +49,22 @@ let allPairs nums =
 
 let canBeDevidedEvenly pair =
     match pair with
-    | (a,b) when (a/b) = 0       -> false
-    | (a,b) when (a/b)%(a/b) = 0 -> true
-    | (a,b) when (b/a)%(b/a) = 0 -> true
-    | _                          -> false
+    | (0,_)                -> false
+    | (_,0)                -> false
+    | (a,b) when (a%b) = 0 -> true
+    | (a,b) when (b%a) = 0 -> true
+    | _                      -> false
 
 let singleMatchInLine  condition line = line
                                         |> List.filter condition
-                                        |> List.head // should be List.exactlyOne
+                                        |> List.exactlyOne
 
 let singlePairThatCanBeEvenlyDevided = singleMatchInLine canBeDevidedEvenly
+
+let higherFirst pair =
+    match pair with
+    | (a,b) when (a>=b) -> pair
+    | (a,b)             -> (b,a)
 
 let partOne = getLines 
                 >> numbersPerLine 
@@ -66,7 +75,8 @@ let partTwo = getLines
                 >> numbersPerLine
                 >> List.map allPairs
                 >> List.map singlePairThatCanBeEvenlyDevided
-                >> List.sumBy (fun (x,y) -> x + y)
+                >> List.map higherFirst
+                >> List.sumBy (fun (x,y) -> x / y)
 
 [<EntryPoint>]
 let main _ =
