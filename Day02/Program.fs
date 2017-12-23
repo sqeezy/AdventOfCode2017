@@ -22,10 +22,6 @@ let input = "5806	6444	1281	38	267	1835	223	4912	5995	230	4395	2986	6048	4719	21
 //1 - compute sum of difference between max and min per line
 //2 - compute sum of only 2 numbers per line that can be dived to reuslt in a flat integer
 
-let inspect o =
-    printfn "inspect - %A" o
-    o
-
 let getLines (fileContent : String) = fileContent.Split [|'\r'|]
 let numbersPerLine (lines : String[]) = lines 
                                             |> Seq.map(fun x -> 
