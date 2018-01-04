@@ -1,6 +1,7 @@
 namespace InverseCaptcha
 open System
 
+[<AutoOpen>]
 module InverseCaptcha =
 
     let digits string = Seq.map (Char.ToString >> Int32.Parse) string |> Seq.toList
